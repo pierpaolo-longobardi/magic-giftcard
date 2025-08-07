@@ -26,12 +26,9 @@ export default function LoginPage() {
           <p className="text-center text-gray-500">
             Accedi con Google per esplorare la nostra collezione esclusiva.
           </p>
-          <button
-            onClick={() => signIn("google")}
-            className="w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition"
-          >
-            Login con Google
-          </button>
+<button onClick={() => signIn("google", { callbackUrl: "/dashboard/profilo" })}>
+  Login con Google
+</button>
         </div>
       </div>
     </main>
