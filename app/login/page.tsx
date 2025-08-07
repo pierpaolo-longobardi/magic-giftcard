@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import { FcGoogle } from "react-icons/fc";
 
 export default function LoginPage() {
   return (
@@ -26,9 +27,16 @@ export default function LoginPage() {
           <p className="text-center text-gray-500">
             Accedi con Google per esplorare la nostra collezione esclusiva.
           </p>
-<button onClick={() => signIn("google", { callbackUrl: "/dashboard/profilo" })}>
-  Login con Google
-</button>
+
+          <button
+            onClick={() =>
+              signIn("google", { callbackUrl: "/dashboard/profilo" })
+            }
+            className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 shadow-sm py-3 px-6 rounded-lg hover:shadow-md transition text-gray-700"
+          >
+            <FcGoogle size={20} />
+            <span className="font-medium">Login con Google</span>
+          </button>
         </div>
       </div>
     </main>
