@@ -1,9 +1,8 @@
-// app/dashboard/layout.tsx
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import {
   LogOut,
   ChevronLeft,
@@ -17,6 +16,7 @@ import { useState } from "react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [open, setOpen] = useState(true);
 
   const links = [
@@ -68,15 +68,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
         </div>
 
-        <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className={`mt-10 flex items-center ${
-            open ? "gap-2 px-3 py-3" : "justify-center py-3"
-          } text-gray-600 hover:text-red-600 hover:bg-gray-100 rounded-lg transition-all duration-300 cursor-pointer`}
-        >
-          <LogOut size={22} />
-          {open && <span>Logout</span>}
-        </button>
+        {/* Logout se sessione presente */}
+        {session && (
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className={`mt-10 flex items-center ${
+              open ? "gap-2 px-3 py-3" : "justify-center py-3"
+            } text-gray-600 hover:text-red-600 hover:bg-gray-100 rounded-lg transition-all duration-300 cursor-pointer`}
+          >
+            <LogOut size={22} />
+            {open && <span>Logout</span>}
+          </button>
+        )}
       </aside>
 
       {/* Contenuto */}
@@ -101,14 +104,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Link>
           );
         })}
-        {/* Logout nella bottom nav */}
-        <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className="flex flex-col items-center text-xs text-gray-600 hover:text-red-600 transition-colors duration-200"
-        >
-          <LogOut size={22} />
-          <span className="text-[11px]">Logout</span>
-        </button>
+        {/* Logout nella bottom nav solo se sessione presente */}
+        {session && (
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="flex flex-col items-center text-xs text-gray-600 hover:text-red-600 transition-colors duration-200"
+          >
+            <LogOut size={22} />
+            <span className="text-[11px]">Logout</span>
+          </button>
+        )}
       </nav>
     </main>
   );

@@ -28,37 +28,46 @@ export default function ProfiloPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
-    if (!session?.user?.email) return;
-
     const fetchData = async () => {
-      // Statistiche
-const userEmail = session.user.email;
+      if (!session?.user?.email) return;
 
-const { count: createdCount } = await supabase
-  .from("giftcards")
-  .select("*", { count: "exact", head: true })
-  .eq("owner_id", userEmail);
+      const userEmail = session.user.email;
+
+      const { count: createdCount } = await supabase
+        .from("giftcards")
+        .select("*", { count: "exact", head: true })
+        .eq("owner_id", userEmail);
 
       const { data: contribs } = await supabase
         .from("giftcard_contributions")
         .select("amount")
-        .eq("user_email", session.user.email);
+        .eq("user_email", userEmail);
 
       const contributedCount = contribs?.length || 0;
       const totalContributed =
         contribs?.reduce((sum, c) => sum + (c.amount || 0), 0) || 0;
 
-      setStats({ createdCount: createdCount || 0, contributedCount, totalContributed });
+      setStats({
+        createdCount: createdCount || 0,
+        contributedCount,
+        totalContributed,
+      });
 
-      // Notifiche: join con giftcards
       const { data: notifData, error } = await supabase
         .from("giftcard_contributions")
-        .select("id, first_name, last_name, amount, created_at, giftcards(name, owner_id)")
-        .eq("giftcards.owner_id", session.user.email)
+        .select(
+          "id, first_name, last_name, amount, created_at, giftcards(name, owner_id)"
+        )
+        .eq("giftcards.owner_id", userEmail)
         .order("created_at", { ascending: false });
 
       if (!error && notifData) {
-        setNotifications(notifData);
+        // Fix: normalizza giftcards da array a singolo oggetto
+        const fixed = notifData.map((n) => ({
+          ...n,
+          giftcards: Array.isArray(n.giftcards) ? n.giftcards[0] : n.giftcards,
+        }));
+        setNotifications(fixed);
       } else if (error) {
         console.error("Errore notifiche:", error.message);
       }
